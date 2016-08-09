@@ -87,14 +87,24 @@ def single_run_script(batch_number, run_number, output_hot_pressure):
 # define parameters here for the journal file
 
 
-b_num = str("013")  # batch number
+b_num = str("017")  # batch number (includes three characters)
 cores = 5  # number of cores used on a run
+read_filename = "In13898KpaPr2CF25"
+starting_hot_pressure = 7469242
+increment = 19000
+sweep_direction = "down"
+runs_in_batch = 5
 
 f = open("Journal_" + b_num + ".JOU", "w")
-f.write(str(startjournal("In3398KpaPr2CF43.cas", "In3398KpaPr2CF43.dat")))
-for x in range(1, 21):
-    hot_pressure = 1790566 - (x-1)*500
-    f.write(str(single_run_script(int(b_num), x, hot_pressure)))
+f.write(str(startjournal(read_filename + ".cas", read_filename + ".dat")))
+for x in range(0, runs_in_batch):
+    if sweep_direction.lower() == "down":
+        hot_pressure = starting_hot_pressure - x * increment
+    elif sweep_direction.lower() == "up":
+        hot_pressure = starting_hot_pressure + x * increment
+    else:
+        print("error: select either up or down for sweep direction")
+    f.write(str(single_run_script(int(b_num), (x+1), hot_pressure)))
 f.write("exit\nyes")  # exit fluent
 
 b = open("Batch_" + b_num + ".bat", "w")
